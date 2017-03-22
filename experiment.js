@@ -15,11 +15,10 @@ var mapping = loader.load('ebay')
 var itemPathPattern = mapping.structure.container + mapping.structure.itemPattern
 var itemPaths = xpath.expand(itemPathPattern)
 
-var actionPromises = mapping.actions.map(scheduleAction)
-Promise.all(actionPromises)
-    .then(() => itemPaths.forEach(showFields))
+Promise.all(mapping.actions.map(scheduleAction))
+    .then(Promise.all(itemPaths.map(showFields))
+        .then(driver.quit()))
 
-//driver.quit();
 
 function scheduleAction(action){
     console.log('action', action)
