@@ -1,3 +1,5 @@
+const xpath = require('./xpath-expander.js')
+
 var webdriver = require('selenium-webdriver'),
     chrome = require('selenium-webdriver/chrome'),
     By = webdriver.By,
@@ -28,7 +30,7 @@ var mapping = {
 }
 
 var itemPathPattern = mapping.structure.container + mapping.structure.itemPattern
-var itemPaths = expandPath(itemPathPattern)
+var itemPaths = xpath.expand(itemPathPattern)
 
 var actionPromises = mapping.actions.map(scheduleAction)
 Promise.all(actionPromises).then(() => {
@@ -62,47 +64,3 @@ function showFields(itemPath) {
         return driver.findElement(By.xpath(fieldPath))
     }
 }
-
-// ------------------------------- expand xpath -----------------------------------------
-
-
-function expandPath(path){
-    var parts = path.split('/')
-    return expandSuffix(parts)
-
-    function expandSuffix(parts){
-       if(parts.length == 0) return []
-       var head = parts[0]
-       var tail = parts.slice(1)
-       var suffixes = expandSuffix(tail)
-       var prependSuffixes = prefix => prependToAll(prefix + '/', suffixes)
-       return flatten(expandNode(head).map(prependSuffixes))
-    }
-}
-
-function expandNode(node){
-    var regex = /\*(\d+)/
-    if(!regex.test(node)) return [node]
-
-    var num = getNum(node)
-    var range = [...Array(num).keys()]
-    return range.map(i => replace(node, i+1))
-
-    function getNum(node){
-        var match = regex.exec(node)
-        return parseInt(match[1])
-    }
-
-    function replace(node, i){
-        return node.replace(regex, i)
-    }
-}
-
-function prependToAll(prefix, suffixes){
-    if(suffixes.length == 0) return [prefix]
-    return suffixes.map(s => prefix + s)
-}
-
-function flatten(xss) {
-    return Array.prototype.concat.apply([], xss);
-};
