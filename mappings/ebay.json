@@ -1,0 +1,19 @@
+{
+  "actions": [
+    { "type": "go", "value": "http://www.ebay.com/" },
+    { "type": "click", "target": "//*[@id='gh-ac']" },
+    { "type": "type", "target": "//*[@id='gh-ac']", "value": "Android" },
+    { "type": "click", "target": "//*[@id='gh-btn']" }
+  ],
+  "structure": {
+    "container": "/html/body/div[5]/div[2]/div[1]/div[1]/div/div[1]/div/div[3]/div/div[1]/div/w-root/div/div/ul",
+    "itemPattern": "/li[*4]",
+    "fields": {
+      "title": "/h3/a",
+      "price": "/ul/li/span",
+      "from": "/ul[2]/li",
+      "type": "/ul/li[2]/span",
+      "photo": "/div/div/a/img"
+    }
+  }
+}
