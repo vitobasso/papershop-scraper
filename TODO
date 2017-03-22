@@ -1,0 +1,7 @@
+
+- speed up
+    - skip image loading
+        http://stackoverflow.com/questions/40035343/javascript-disable-images-in-selenium-chromedriver
+        http://www.sinaru.com/2015/04/18/speed-up-selenium-web-driver-tests-by-disabling-images-and-css/
+
+- headless driver

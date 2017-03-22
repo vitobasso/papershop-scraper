@@ -3,18 +3,7 @@ var webdriver = require('selenium-webdriver'),
     By = webdriver.By,
     until = webdriver.until;
 
-var capabilities = {
-    prefs: {
-       profile: {
-           managed_default_content_settings: {
-               images: 2
-           }
-       }
-    }
-}
-
 var driver = new webdriver.Builder()
-    .withCapabilities(capabilities)
     .forBrowser('chrome')
     .build()
 
