@@ -4,6 +4,7 @@ var loader = require('./mapping-loader.js')
 var webdriver = require('selenium-webdriver'),
 //    chrome = require('selenium-webdriver/chrome'),
     firefox = require('selenium-webdriver/firefox'),
+//    phantomjs = require('selenium-webdriver/phantomjs'),
     By = webdriver.By,
     until = webdriver.until;
 
@@ -20,6 +21,11 @@ var driver = new webdriver.Builder()
     .forBrowser('firefox')
     .setFirefoxOptions(options)
     .build();
+//"javascriptEnabled" false
+//"loadImages" false
+//var driver = new webdriver.Builder()
+//    .forBrowser('phantomjs')
+//    .build()
 
 
 var mapping = loader.load('ebay')
@@ -45,7 +51,6 @@ function scheduleAction(action){
 }
 
 function extractFields(itemPath) {
-    console.log('extract', itemPath)
     var textVal = find('title').getText()
     var priceVal = find('price').getText()
     var fromVal = find('from').getText()
