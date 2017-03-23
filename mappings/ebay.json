@@ -1,5 +1,5 @@
 {
-  "actions": [
+  "steps": [
     { "type": "go", "value": "http://www.ebay.com/" },
     { "type": "click", "target": "//*[@id='gh-ac']" },
     { "type": "type", "target": "//*[@id='gh-ac']", "value": "Android" },
@@ -15,5 +15,6 @@
       "type": "/ul/li[2]/span",
       "photo": "/div/div/a/img"
     }
-  }
+  },
+  "next-page": { "type": "click", "target": "//*[@id=\"Pagination\"]/tbody/tr/td[3]/a" }
 }

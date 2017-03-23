@@ -15,10 +15,14 @@ var mapping = loader.load('ebay')
 var itemPathPattern = mapping.structure.container + mapping.structure.itemPattern
 var itemPaths = xpath.expand(itemPathPattern)
 
-Promise.all(mapping.actions.map(scheduleAction))
-    .then(Promise.all(itemPaths.map(showFields))
-        .then(driver.quit()))
-
+Promise.all(mapping.steps.map(scheduleAction))
+    .then(Promise.all(itemPaths.map(extractFields))
+        .then(scheduleAction(mapping['next-page'])
+            .then(Promise.all(itemPaths.map(extractFields))
+                .then(driver.quit())
+            )
+        )
+    )
 
 function scheduleAction(action){
     console.log('action', action)
@@ -28,8 +32,8 @@ function scheduleAction(action){
     console.err('unknown action', action)
 }
 
-function showFields(itemPath) {
-    console.log('showFields', itemPath)
+function extractFields(itemPath) {
+    console.log('extract', itemPath)
     var textVal = find('title').getText()
     var priceVal = find('price').getText()
     var fromVal = find('from').getText()
