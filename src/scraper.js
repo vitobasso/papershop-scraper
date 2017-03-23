@@ -2,13 +2,25 @@ var xpath = require('./xpath-expander.js')
 var loader = require('./mapping-loader.js')
 
 var webdriver = require('selenium-webdriver'),
-    chrome = require('selenium-webdriver/chrome'),
+//    chrome = require('selenium-webdriver/chrome'),
+    firefox = require('selenium-webdriver/firefox'),
     By = webdriver.By,
     until = webdriver.until;
 
+//var driver = new webdriver.Builder()
+//    .forBrowser('chrome')
+//    .build()
+var profile = new firefox.Profile();
+//profile.setPreference('permissions.default.stylesheet', 2) //Disable CSS
+profile.setPreference('permissions.default.image', 2) //Disable images
+//profile.setPreference('javascript.enabled', false) //Disable JavaScript
+profile.setPreference('dom.ipc.plugins.enabled.libflashplayer.so','false') //Disable Flash
+var options = new firefox.Options().setProfile(profile);
 var driver = new webdriver.Builder()
-    .forBrowser('chrome')
-    .build()
+    .forBrowser('firefox')
+    .setFirefoxOptions(options)
+    .build();
+
 
 var mapping = loader.load('ebay')
 
@@ -45,6 +57,8 @@ function extractFields(itemPath) {
 
     function find(field){
         var fieldPath = itemPath + mapping.structure.fields[field]
+        var locator = By.xpath(fieldPath)
+        driver.wait(until.elementLocated(locator), 5 * 1000)
         return driver.findElement(By.xpath(fieldPath))
     }
 }
