@@ -7,14 +7,14 @@ var webdriver = require('selenium-webdriver'),
 var driver = require('./driver/firefox')
 
 
-var mapping = loader.load('ebay')
+var site = loader.load('ebay')
 
-var itemPathPattern = mapping.structure.container + mapping.structure.itemPattern
+var itemPathPattern = site.structure.container + site.structure.itemPattern
 var itemPaths = xpath.expand(itemPathPattern)
 
-Promise.all(mapping.steps.map(scheduleAction))
+Promise.all(site.steps.map(scheduleAction))
     .then(Promise.all(itemPaths.map(extractFields))
-        .then(scheduleAction(mapping['next-page'])
+        .then(scheduleAction(site['next-page'])
             .then(Promise.all(itemPaths.map(extractFields))
                 .then(driver.quit())
             )
@@ -40,7 +40,7 @@ function extractFields(itemPath) {
     )
 
     function find(field){
-        var fieldPath = itemPath + mapping.structure.fields[field]
+        var fieldPath = itemPath + site.structure.fields[field]
         var locator = By.xpath(fieldPath)
         driver.wait(until.elementLocated(locator), 5 * 1000)
         return driver.findElement(By.xpath(fieldPath))
