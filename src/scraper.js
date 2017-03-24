@@ -2,30 +2,9 @@ var xpath = require('./xpath-expander.js')
 var loader = require('./mapping-loader.js')
 
 var webdriver = require('selenium-webdriver'),
-//    chrome = require('selenium-webdriver/chrome'),
-    firefox = require('selenium-webdriver/firefox'),
-//    phantomjs = require('selenium-webdriver/phantomjs'),
     By = webdriver.By,
     until = webdriver.until;
-
-//var driver = new webdriver.Builder()
-//    .forBrowser('chrome')
-//    .build()
-var profile = new firefox.Profile();
-//profile.setPreference('permissions.default.stylesheet', 2) //Disable CSS
-profile.setPreference('permissions.default.image', 2) //Disable images
-//profile.setPreference('javascript.enabled', false) //Disable JavaScript
-profile.setPreference('dom.ipc.plugins.enabled.libflashplayer.so','false') //Disable Flash
-var options = new firefox.Options().setProfile(profile);
-var driver = new webdriver.Builder()
-    .forBrowser('firefox')
-    .setFirefoxOptions(options)
-    .build();
-//"javascriptEnabled" false
-//"loadImages" false
-//var driver = new webdriver.Builder()
-//    .forBrowser('phantomjs')
-//    .build()
+var driver = require('./driver/firefox')
 
 
 var mapping = loader.load('ebay')
