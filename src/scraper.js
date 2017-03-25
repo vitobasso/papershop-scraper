@@ -33,8 +33,9 @@ var extractFields = (callback) => (itemPath) => {
     var fieldPromises = fieldKeys.map(extractField)
     Promise.all(fieldPromises).then(
         (values) => {
-            console.log('extracted fields', values)
-            callback(values)
+            item = gatherFields(values)
+            console.log('extracted item', item)
+            callback(item)
         }
     )
 
@@ -44,6 +45,14 @@ var extractFields = (callback) => (itemPath) => {
         var elmPath = itemPath + extractor.path
         var elm = find(elmPath)
         return extractor.getter(elm)
+    }
+
+    function gatherFields(values){
+        return values.reduce(function(obj, value, i) {
+            var key = fieldKeys[i]
+            obj[key] = value;
+            return obj;
+        }, {});
     }
 
     function text(field){
