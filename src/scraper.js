@@ -14,10 +14,12 @@ var itemPaths = xpath.expand(itemPathPattern)
 
 Promise.all(site.steps.map(scheduleAction))
 
-function scrapePage(callback){
-    var extract = extractFields(callback)
-    Promise.all(itemPaths.map(extract))
-        .then(scheduleAction(site['next-page']))
+function scrapePage(send){
+    Promise.all(itemPaths.map(extractFields))
+        .then((items) => {
+            send(items)
+            scheduleAction(site['next-page'])
+        })
 }
 
 function scheduleAction(action){
@@ -28,16 +30,14 @@ function scheduleAction(action){
     console.err('unknown action', action)
 }
 
-var extractFields = (callback) => (itemPath) => {
+function extractFields(itemPath) {
     var fieldKeys = Object.keys(site.structure.fields)
     var fieldPromises = fieldKeys.map(extractField)
-    Promise.all(fieldPromises).then(
-        (values) => {
-            item = gatherFields(values)
-            console.log('extracted item', item)
-            callback(item)
-        }
-    )
+    return Promise.all(fieldPromises).then( (values) => {
+        item = gatherFields(values)
+        console.log('extracted item', item)
+        return item
+    })
 
     function extractField(key) {
         var field = site.structure.fields[key]
@@ -89,8 +89,6 @@ wss.on('connection', function connection(ws) {
         console.log('received: %s', message);
         handle(message, ws)
     });
-
-    ws.send('opa');
 });
 
 function handle(msg, ws){
