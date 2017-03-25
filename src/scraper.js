@@ -4,7 +4,7 @@ var loader = require('./mapping-loader.js')
 var webdriver = require('selenium-webdriver'),
     By = webdriver.By,
     until = webdriver.until;
-var driver = require('./driver/firefox')
+var driver = require('./driver/phantomjs').driver
 
 
 var site = loader.load('ebay')
