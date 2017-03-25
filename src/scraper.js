@@ -6,20 +6,19 @@ var webdriver = require('selenium-webdriver'),
     until = webdriver.until;
 var driver = require('./driver/phantomjs').driver
 
-
+var timeout = 10 * 000 // millis
 var site = loader.load('ebay')
 
 var itemPathPattern = site.structure.container + site.structure.itemPattern
 var itemPaths = xpath.expand(itemPathPattern)
 
 Promise.all(site.steps.map(scheduleAction))
-    .then(Promise.all(itemPaths.map(extractFields))
-        .then(scheduleAction(site['next-page'])
-            .then(Promise.all(itemPaths.map(extractFields))
-                .then(driver.quit())
-            )
-        )
-    )
+
+function scrapePage(callback){
+    var extract = extractFields(callback)
+    Promise.all(itemPaths.map(extract))
+        .then(scheduleAction(site['next-page']))
+}
 
 function scheduleAction(action){
     console.log('action', action)
@@ -29,20 +28,69 @@ function scheduleAction(action){
     console.err('unknown action', action)
 }
 
-function extractFields(itemPath) {
-    var textVal = find('title').getText()
-    var priceVal = find('price').getText()
-    var fromVal = find('from').getText()
-    var typeVal = find('type').getText()
-    var photoVal = find('photo').getAttribute("src")
-    Promise.all([textVal, priceVal, fromVal, typeVal, photoVal]).then(
-        (values) => console.log(values)
+var extractFields = (callback) => (itemPath) => {
+    var fieldKeys = Object.keys(site.structure.fields)
+    var fieldPromises = fieldKeys.map(extractField)
+    Promise.all(fieldPromises).then(
+        (values) => {
+            console.log('extracted fields', values)
+            callback(values)
+        }
     )
 
-    function find(field){
-        var fieldPath = itemPath + site.structure.fields[field]
-        var locator = By.xpath(fieldPath)
-        driver.wait(until.elementLocated(locator), 5 * 1000)
-        return driver.findElement(By.xpath(fieldPath))
+    function extractField(key) {
+        var field = site.structure.fields[key]
+        var extractor = text(field) || attr(field)
+        var elmPath = itemPath + extractor.path
+        var elm = find(elmPath)
+        return extractor.getter(elm)
+    }
+
+    function text(field){
+        var match = /^(.*)\/text\(\)$/.exec(field)
+        if(match) return {
+            path: match[1],
+            getter: (elm) => elm.getText()
+        }
+    }
+
+    function attr(field){
+        var match = /^(.*)\[@(.*)\]$/.exec(field)
+        if(match) return {
+            path: match[1],
+            getter: (elm) => elm.getAttribute(match[2])
+        }
     }
 }
+
+function find(path){
+    var locator = By.xpath(path)
+    driver.wait(until.elementLocated(locator), timeout)
+    return driver.findElement(By.xpath(path))
+}
+
+// --------------------------------------------------------------------------------
+
+var WebSocket = require('ws');
+var wss = new WebSocket.Server({ port: 8080 });
+wss.on('connection', function connection(ws) {
+    console.log('on connection')
+
+    ws.on('message', function incoming(message) {
+        console.log('received: %s', message);
+        handle(message, ws)
+    });
+
+    ws.send('opa');
+});
+
+function handle(msg, ws){
+    if(msg == 'more') {
+        var send = (data) => {
+            var msg = JSON.stringify(data)
+            ws.send(msg)
+        }
+        scrapePage(send)
+    } else if(msg == 'quit') driver.quit()
+}
+

@@ -9,11 +9,12 @@
     "container": "/html/body/div[5]/div[2]/div[1]/div[1]/div/div[1]/div/div[3]/div/div[1]/div/w-root/div/div/ul",
     "itemPattern": "/li[*50]",
     "fields": {
-      "title": "/h3/a",
-      "price": "/ul/li/span",
-      "from": "/ul[2]/li",
-      "type": "/ul/li[2]/span",
-      "photo": "/div/div/a/img"
+      "title": "/h3/a/text()",
+      "price": "/ul/li/span/text()",
+      "from": "/ul[2]/li/text()",
+      "type": "/ul/li[2]/span/text()",
+      "photo": "/div/div/a/img[@src]",
+      "link": "/h3/a[@href]"
     }
   },
   "next-page": { "type": "click", "target": "//*[@id=\"Pagination\"]/tbody/tr/td[3]/a" }
