@@ -13,7 +13,7 @@
       "price": "/ul/li/span/text()",
       "from": "/ul[2]/li/text()",
       "type": "/ul/li[2]/span/text()",
-      "photo": "/div/div/a/img[@src]",
+      "image": "/div/div/a/img[@src]",
       "link": "/h3/a[@href]"
     }
   },
