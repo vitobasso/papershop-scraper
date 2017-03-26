@@ -4,9 +4,8 @@ var loader = require('./mapping-loader.js')
 var webdriver = require('selenium-webdriver'),
     By = webdriver.By,
     until = webdriver.until;
-var driver = require('./driver/phantomjs').driver
+var driver = require('./driver/firefox').driver
 
-var timeout = 10 * 000 // millis
 var site = loader.load('ebay')
 
 var itemPathPattern = site.structure.container + site.structure.itemPattern
@@ -17,8 +16,11 @@ Promise.all(site.steps.map(pageAction))
     .then( log("page: ready") )
 
 function scrapePage(send){
-    Promise.all(itemPaths.map(extractFields))
+    var t1 = Date.now()
+    promiseAsync(itemPaths, extractFields)
         .then((items) => {
+            var duration = Date.now() - t1 + "ms"
+            console.log('scraped page: ', duration)
             pageAction(site['next-page'])
                 .then( log("page: ready") )
             send(items)
@@ -35,12 +37,14 @@ function pageAction(action){
 
 function extractFields(itemPath) {
     var fieldKeys = Object.keys(site.structure.fields)
-    var fieldPromises = fieldKeys.map(extractField)
-    return Promise.all(fieldPromises).then( (values) => {
-        item = gatherFields(values)
-        console.log('extracted item: ', item.title)
-        return item
-    })
+    var t1 = Date.now()
+    return promiseAsync(fieldKeys, extractField)
+        .then( (values) => {
+            item = gatherFields(values)
+            var duration = Date.now() - t1 + "ms"
+            console.log('extracted item: ', duration, item.title)
+            return item
+        })
 
     function extractField(key) {
         var field = site.structure.fields[key]
@@ -77,8 +81,23 @@ function extractFields(itemPath) {
 
 function find(path){
     var locator = By.xpath(path)
-    driver.wait(until.elementLocated(locator), timeout)
     return driver.findElement(By.xpath(path))
+}
+
+function promiseSync(arr, getPromise){
+    if(arr.length == 0) return
+    var head = arr[0]
+    var tail = arr.slice(1)
+    return getPromise(head)
+        .then(() => promiseSync(tail, getPromise))
+}
+
+function promiseAsync(arr, f){
+    return Promise.all(
+        arr.map((x) => {
+            var fx = () => f(x)
+            return webdriver.promise.createFlow(fx)
+        }))
 }
 
 // --------------------------------------------------------------------------------
