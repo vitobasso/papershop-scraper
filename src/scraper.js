@@ -11,18 +11,21 @@ var site = loader.load('ebay')
 
 var itemPathPattern = site.structure.container + site.structure.itemPattern
 var itemPaths = xpath.expand(itemPathPattern)
+var log = (s) => () => console.log(s)
 
-Promise.all(site.steps.map(scheduleAction))
+Promise.all(site.steps.map(pageAction))
+    .then( log("page: ready") )
 
 function scrapePage(send){
     Promise.all(itemPaths.map(extractFields))
         .then((items) => {
+            pageAction(site['next-page'])
+                .then( log("page: ready") )
             send(items)
-            scheduleAction(site['next-page'])
         })
 }
 
-function scheduleAction(action){
+function pageAction(action){
     console.log('action', action)
     if(action.type == 'go') return driver.get(action.value)
     if(action.type == 'click') return driver.findElement(By.xpath(action.target)).click();
@@ -35,7 +38,7 @@ function extractFields(itemPath) {
     var fieldPromises = fieldKeys.map(extractField)
     return Promise.all(fieldPromises).then( (values) => {
         item = gatherFields(values)
-        console.log('extracted item', item)
+        console.log('extracted item: ', item.title)
         return item
     })
 
@@ -83,10 +86,10 @@ function find(path){
 var WebSocket = require('ws');
 var wss = new WebSocket.Server({ port: 8080 });
 wss.on('connection', function connection(ws) {
-    console.log('on connection')
+    console.log('ws: connected')
 
     ws.on('message', function incoming(message) {
-        console.log('received: %s', message);
+        console.log('ws: received ', message);
         handle(message, ws)
     });
 });
