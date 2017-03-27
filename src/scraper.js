@@ -14,18 +14,6 @@ var log = (s) => () => console.log(s)
 Promise.all(site.steps.map(pageAction))
     .then( log("page: ready") )
 
-function scrapePage(send){
-    var t1 = Date.now()
-    promiseAsync(itemPaths, extractFields)
-        .then((items) => {
-            var duration = Date.now() - t1 + "ms"
-            console.log('scraped page: ', duration)
-            pageAction(site.itemList['next-page'])
-                .then( log("page: ready") )
-            send(items)
-        })
-}
-
 function pageAction(action){
     console.log('action', action)
     if(action.type == 'go') return driver.get(action.value)
@@ -34,7 +22,23 @@ function pageAction(action){
     console.err('unknown action', action)
 }
 
-function extractFields(itemPath) {
+function scrapeItems(send){
+    var t1 = Date.now()
+    promiseAsync(itemPaths, scrapeFields)
+        .then((items) => {
+            var duration = Date.now() - t1 + "ms"
+            console.log('scraped page: ', duration)
+            nextPage()
+            send(items)
+        })
+}
+
+function nextPage(){
+    pageAction(site.itemList['next-page'])
+        .then( log("page: ready") )
+}
+
+function scrapeFields(itemPath) {
     var fieldKeys = Object.keys(site.itemList.fields)
     var t1 = Date.now()
     return promiseAsync(fieldKeys, extractField)
@@ -118,7 +122,7 @@ function handle(msg, ws){
             var msg = JSON.stringify(data)
             ws.send(msg)
         }
-        scrapePage(send)
+        scrapeItems(send)
     } else if(msg == 'quit') driver.quit()
 }
 
