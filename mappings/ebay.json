@@ -5,9 +5,8 @@
     { "type": "type", "target": "//*[@id='gh-ac']", "value": "Android" },
     { "type": "click", "target": "//*[@id='gh-btn']" }
   ],
-  "structure": {
-    "container": "/html/body/div[5]/div[2]/div[1]/div[1]/div/div[1]/div/div[3]/div/div[1]/div/w-root/div/div/ul",
-    "itemPattern": "/li[*50]",
+  "itemList": {
+    "items": "/html/body/div[5]/div[2]/div[1]/div[1]/div/div[1]/div/div[3]/div/div[1]/div/w-root/div/div/ul/li[*50]",
     "fields": {
       "title": "/h3/a/text()",
       "price": "/ul/li/span/text()",
@@ -15,7 +14,12 @@
       "type": "/ul/li[2]/span/text()",
       "image": "/div/div/a/img[@src]",
       "link": "/h3/a[@href]"
-    }
+    },
+    "next-page": { "type": "click", "target": "//*[@id=\"Pagination\"]/tbody/tr/td[3]/a" }
   },
-  "next-page": { "type": "click", "target": "//*[@id=\"Pagination\"]/tbody/tr/td[3]/a" }
+  "features": {
+    "container": "/html/body/div[5]/div[2]/div[1]/div[3]/div/div/div[1]/div[2]/div[*]",
+    "keys": "/div/span/h3",
+    "values": "/div[2]/div[*]/a/label/span"
+  }
 }

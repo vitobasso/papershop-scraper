@@ -1,5 +1,12 @@
+# environment
 .DS_Store
 .idea/
 *.iml
+
+# nodejs
 node_modules/
 npm-debug.log
+
+# peofiling
+profile-*
+isolate-*.log

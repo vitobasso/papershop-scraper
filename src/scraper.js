@@ -8,8 +8,7 @@ var driver = require('./driver/firefox').driver
 
 var site = loader.load('ebay')
 
-var itemPathPattern = site.structure.container + site.structure.itemPattern
-var itemPaths = xpath.expand(itemPathPattern)
+var itemPaths = xpath.expand(site.itemList.items)
 var log = (s) => () => console.log(s)
 
 Promise.all(site.steps.map(pageAction))
@@ -21,7 +20,7 @@ function scrapePage(send){
         .then((items) => {
             var duration = Date.now() - t1 + "ms"
             console.log('scraped page: ', duration)
-            pageAction(site['next-page'])
+            pageAction(site.itemList['next-page'])
                 .then( log("page: ready") )
             send(items)
         })
@@ -36,7 +35,7 @@ function pageAction(action){
 }
 
 function extractFields(itemPath) {
-    var fieldKeys = Object.keys(site.structure.fields)
+    var fieldKeys = Object.keys(site.itemList.fields)
     var t1 = Date.now()
     return promiseAsync(fieldKeys, extractField)
         .then( (values) => {
@@ -47,7 +46,7 @@ function extractFields(itemPath) {
         })
 
     function extractField(key) {
-        var field = site.structure.fields[key]
+        var field = site.itemList.fields[key]
         var extractor = text(field) || attr(field)
         var elmPath = itemPath + extractor.path
         var elm = find(elmPath)
