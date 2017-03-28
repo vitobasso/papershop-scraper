@@ -9,7 +9,7 @@ function expandNodes(nodes){
    var head = nodes[0]
    var tail = nodes.slice(1)
    var suffixes = expandNodes(tail)
-   var prependSuffixes = prefix => prependToAll(prefix + '/', suffixes)
+   var prependSuffixes = prefix => prependToAll(prefix, suffixes, '/')
    return flatten(expandNode(head).map(prependSuffixes))
 }
 
@@ -31,9 +31,9 @@ function expandNode(node){
     }
 }
 
-function prependToAll(prefix, suffixes){
+function prependToAll(prefix, suffixes, separator=''){
     if(suffixes.length == 0) return [prefix]
-    return suffixes.map(s => prefix + s)
+    return suffixes.map(s => prefix + separator + s)
 }
 
 function flatten(xss) {

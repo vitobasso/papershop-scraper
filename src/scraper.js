@@ -51,7 +51,7 @@ function extractItem(itemPath) {
     }
 
     function gatherFields(values){
-        return values.reduce(function(obj, value, i) {
+        return values.reduce((obj, value, i) => {
             var key = fieldKeys[i]
             obj[key] = value;
             return obj;
