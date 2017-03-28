@@ -19,7 +19,7 @@
   },
   "features": {
     "container": "/html/body/div[5]/div[2]/div[1]/div[3]/div/div/div[1]/div[2]/div[*]",
-    "keys": "/div/span/h3",
-    "values": "/div[2]/div[*]/a/label/span"
+    "key": "/div/span/h3/text()",
+    "values": "/div[2]/div[*]/a/label/span/text()"
   }
 }

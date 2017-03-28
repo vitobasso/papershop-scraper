@@ -9,6 +9,7 @@ var driver = require('./driver/firefox').driver
 var site = loader.load('ebay')
 
 var itemPaths = xpath.expand(site.itemList.items)
+var featurePaths = xpath.expand(site.features.container)
 var log = (s) => () => console.log(s)
 
 Promise.all(site.steps.map(pageAction))
@@ -22,14 +23,24 @@ function pageAction(action){
     console.err('unknown action', action)
 }
 
-function scrapeItems(send){
+function extractItems(send){
     var t1 = Date.now()
-    promiseAsync(itemPaths, scrapeFields)
+    promiseAsync(itemPaths, extractItem)
         .then((items) => {
             var duration = Date.now() - t1 + "ms"
-            console.log('scraped page: ', duration)
+            console.log('extracted items:', duration)
             nextPage()
             send(items)
+        })
+}
+
+function extractFeatures(send){
+    var t1 = Date.now()
+    promiseAsync(featurePaths, extractFeature)
+        .then((features) => {
+            var duration = Date.now() - t1 + "ms"
+            console.log('extracted features:', duration, features)
+            send(features)
         })
 }
 
@@ -38,23 +49,20 @@ function nextPage(){
         .then( log("page: ready") )
 }
 
-function scrapeFields(itemPath) {
+function extractItem(itemPath) {
     var fieldKeys = Object.keys(site.itemList.fields)
     var t1 = Date.now()
     return promiseAsync(fieldKeys, extractField)
         .then( (values) => {
             item = gatherFields(values)
             var duration = Date.now() - t1 + "ms"
-            console.log('extracted item: ', duration, item.title)
+            console.log('extracted item:', duration, item.title)
             return item
         })
 
     function extractField(key) {
-        var field = site.itemList.fields[key]
-        var extractor = text(field) || attr(field)
-        var elmPath = itemPath + extractor.path
-        var elm = find(elmPath)
-        return extractor.getter(elm)
+        var path = itemPath + site.itemList.fields[key]
+        return extract(path)
     }
 
     function gatherFields(values){
@@ -64,6 +72,24 @@ function scrapeFields(itemPath) {
             return obj;
         }, {});
     }
+
+}
+
+function extractFeature(path){
+    var keyPath = path + site.features.key
+    var valuePaths = xpath.expand(path + site.features.values)
+    var key = extract(keyPath)
+    var values = promiseAsync(valuePaths, extract)
+    return Promise.all(key, values).then((key, values) => {
+        key: key,
+        values: values
+    })
+}
+
+function extract(path){
+    var extractor = text(path) || attr(path)
+    var elm = find(extractor.path)
+    return extractor.getter(elm)
 
     function text(field){
         var match = /^(.*)\/text\(\)$/.exec(field)
@@ -122,7 +148,7 @@ function handle(msg, ws){
             var msg = JSON.stringify(data)
             ws.send(msg)
         }
-        scrapeItems(send)
+        extractItems(send)
     } else if(msg == 'quit') driver.quit()
 }
 
