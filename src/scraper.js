@@ -71,6 +71,7 @@ function extractFeatures(send){
     var t1 = Date.now()
     promiseAsync(featurePaths, extractFeature)
         .then(features => {
+            features = features.filter(Boolean)
             var duration = Date.now() - t1 + "ms"
             console.log('extracted features:', duration, features)
             send(features)
@@ -83,7 +84,7 @@ function extractFeatures(send){
         var values = promiseAsync(valuePaths, extract)
         return promise.all([key, values]).then(result => ({
             key: result[0],
-            values: result[1]
+            values: result[1].filter(Boolean)
         }))
     }
 }
@@ -94,6 +95,10 @@ function extract(path){
     var extractor = text(path) || attr(path)
     return find(extractor.path)
         .then(extractor.getter)
+        .catch(ex => {
+            console.log('extract: failed:', path)
+            return null
+        })
 
     function text(field){
         var match = /^(.*)\/text\(\)$/.exec(field)
