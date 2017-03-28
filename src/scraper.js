@@ -4,15 +4,16 @@ var loader = require('./mapping-loader.js')
 var webdriver = require('selenium-webdriver'),
     By = webdriver.By,
     until = webdriver.until;
+    promise = webdriver.promise
 var driver = require('./driver/firefox').driver
 
 var site = loader.load('ebay')
 
 var itemPaths = xpath.expand(site.itemList.items)
 var featurePaths = xpath.expand(site.features.container)
-var log = (s) => () => console.log(s)
+var log = s => () => console.log(s)
 
-Promise.all(site.steps.map(pageAction))
+promise.all(site.steps.map(pageAction))
     .then( log("page: ready") )
 
 function pageAction(action){
@@ -26,78 +27,79 @@ function pageAction(action){
 function extractItems(send){
     var t1 = Date.now()
     promiseAsync(itemPaths, extractItem)
-        .then((items) => {
+        .then(items => {
             var duration = Date.now() - t1 + "ms"
             console.log('extracted items:', duration)
             nextPage()
             send(items)
         })
-}
 
-function extractItem(itemPath) {
-    var fieldKeys = Object.keys(site.itemList.fields)
-    var t1 = Date.now()
-    return promiseAsync(fieldKeys, extractField)
-        .then( (values) => {
-            item = gatherFields(values)
-            var duration = Date.now() - t1 + "ms"
-            console.log('extracted item:', duration, item.title)
-            return item
-        })
+    function extractItem(itemPath) {
+        var fieldKeys = Object.keys(site.itemList.fields)
+        var t1 = Date.now()
+        return promiseAsync(fieldKeys, extractField)
+            .then(values => {
+                item = gatherFields(values)
+                var duration = Date.now() - t1 + "ms"
+                console.log('extracted item:', duration, item.title)
+                return item
+            })
 
-    function extractField(key) {
-        var path = itemPath + site.itemList.fields[key]
-        return extract(path)
+        function extractField(key) {
+            var path = itemPath + site.itemList.fields[key]
+            return extract(path)
+        }
+
+        function gatherFields(values){
+            return values.reduce((obj, value, i) => {
+                var key = fieldKeys[i]
+                obj[key] = value;
+                return obj;
+            }, {});
+        }
+
     }
 
-    function gatherFields(values){
-        return values.reduce((obj, value, i) => {
-            var key = fieldKeys[i]
-            obj[key] = value;
-            return obj;
-        }, {});
+    function nextPage(){
+        pageAction(site.itemList['next-page'])
+            .then( log("page: ready") )
     }
-
 }
 
-function nextPage(){
-    pageAction(site.itemList['next-page'])
-        .then( log("page: ready") )
-}
 
 function extractFeatures(send){
     var t1 = Date.now()
     promiseAsync(featurePaths, extractFeature)
-        .then((features) => {
+        .then(features => {
             var duration = Date.now() - t1 + "ms"
             console.log('extracted features:', duration, features)
             send(features)
         })
-}
 
-function extractFeature(path){
-    var keyPath = path + site.features.key
-    var valuePaths = xpath.expand(path + site.features.values)
-    var key = extract(keyPath)
-    var values = promiseAsync(valuePaths, extract)
-    return Promise.all(key, values).then((key, values) => ({
-        key: key,
-        values: values
-    }))
+    function extractFeature(path){
+        var keyPath = path + site.features.key
+        var valuePaths = xpath.expand(path + site.features.values)
+        var key = extract(keyPath)
+        var values = promiseAsync(valuePaths, extract)
+        return promise.all([key, values]).then(result => ({
+            key: result[0],
+            values: result[1]
+        }))
+    }
 }
 
 // ------------------------------- Generic -------------------------------
 
 function extract(path){
     var extractor = text(path) || attr(path)
-    var elm = find(extractor.path)
-    return extractor.getter(elm)
+    return find(extractor.path)
+        .then(extractor.getter)
 
     function text(field){
         var match = /^(.*)\/text\(\)$/.exec(field)
         if(match) return {
             path: match[1],
-            getter: (elm) => elm.getText()
+            getter: elm => elm.getText()
         }
     }
 
@@ -105,7 +107,7 @@ function extract(path){
         var match = /^(.*)\[@(.*)\]$/.exec(field)
         if(match) return {
             path: match[1],
-            getter: (elm) => elm.getAttribute(match[2])
+            getter: elm => elm.getAttribute(match[2])
         }
     }
 }
@@ -124,10 +126,10 @@ function promiseSync(arr, getPromise){
 }
 
 function promiseAsync(arr, f){
-    return Promise.all(
-        arr.map((x) => {
+    return promise.all(
+        arr.map(x => {
             var fx = () => f(x)
-            return webdriver.promise.createFlow(fx)
+            return promise.createFlow(fx)
         }))
 }
 
@@ -139,7 +141,7 @@ wss.on('connection', function connection(ws) {
     console.log('ws: connected')
 
     ws.on('message', function incoming(message) {
-        console.log('ws: received ', message);
+        console.log('ws: received:', message);
         handle(message, ws)
     });
 });
