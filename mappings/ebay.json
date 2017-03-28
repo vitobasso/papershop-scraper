@@ -18,8 +18,8 @@
     "next-page": { "type": "click", "target": "//*[@id=\"Pagination\"]/tbody/tr/td[3]/a" }
   },
   "features": {
-    "container": "/html/body/div[5]/div[2]/div[1]/div[3]/div/div/div[1]/div[2]/div[*]",
+    "container": "/html/body/div[5]/div[2]/div[1]/div[3]/div/div/div[1]/div[2]/div[*5]",
     "key": "/div/span/h3/text()",
-    "values": "/div[2]/div[*]/a/label/span/text()"
+    "values": "/div[2]/div[*3]/a/label/span/text()"
   }
 }

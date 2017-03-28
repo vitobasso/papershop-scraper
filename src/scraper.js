@@ -34,21 +34,6 @@ function extractItems(send){
         })
 }
 
-function extractFeatures(send){
-    var t1 = Date.now()
-    promiseAsync(featurePaths, extractFeature)
-        .then((features) => {
-            var duration = Date.now() - t1 + "ms"
-            console.log('extracted features:', duration, features)
-            send(features)
-        })
-}
-
-function nextPage(){
-    pageAction(site.itemList['next-page'])
-        .then( log("page: ready") )
-}
-
 function extractItem(itemPath) {
     var fieldKeys = Object.keys(site.itemList.fields)
     var t1 = Date.now()
@@ -75,15 +60,30 @@ function extractItem(itemPath) {
 
 }
 
+function nextPage(){
+    pageAction(site.itemList['next-page'])
+        .then( log("page: ready") )
+}
+
+function extractFeatures(send){
+    var t1 = Date.now()
+    promiseAsync(featurePaths, extractFeature)
+        .then((features) => {
+            var duration = Date.now() - t1 + "ms"
+            console.log('extracted features:', duration, features)
+            send(features)
+        })
+}
+
 function extractFeature(path){
     var keyPath = path + site.features.key
     var valuePaths = xpath.expand(path + site.features.values)
     var key = extract(keyPath)
     var values = promiseAsync(valuePaths, extract)
-    return Promise.all(key, values).then((key, values) => {
+    return Promise.all(key, values).then((key, values) => ({
         key: key,
         values: values
-    })
+    }))
 }
 
 function extract(path){
