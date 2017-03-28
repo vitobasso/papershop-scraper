@@ -86,6 +86,8 @@ function extractFeature(path){
     }))
 }
 
+// ------------------------------- Generic -------------------------------
+
 function extract(path){
     var extractor = text(path) || attr(path)
     var elm = find(extractor.path)
@@ -129,7 +131,7 @@ function promiseAsync(arr, f){
         }))
 }
 
-// --------------------------------------------------------------------------------
+// ------------------------------- WebSocket -------------------------------
 
 var WebSocket = require('ws');
 var wss = new WebSocket.Server({ port: 8080 });
@@ -143,12 +145,13 @@ wss.on('connection', function connection(ws) {
 });
 
 function handle(msg, ws){
-    if(msg == 'more') {
-        var send = (data) => {
-            var msg = JSON.stringify(data)
-            ws.send(msg)
-        }
-        extractItems(send)
-    } else if(msg == 'quit') driver.quit()
+    if(msg == 'items') extractItems(send)
+    else if(msg == 'features') extractFeatures(send)
+    else if(msg == 'quit') driver.quit()
+
+    function send(data) {
+        var msg = JSON.stringify(data)
+        ws.send(msg)
+    }
 }
 
