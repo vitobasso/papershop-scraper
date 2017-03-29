@@ -119,12 +119,9 @@ function extractItems(){
     return itemPaths.map(extractItem)
 
     function extractItem(itemPath) {
-        console.log('extractItem', itemPath)
         var fieldKeys = Object.keys(site.itemList.fields)
         var values = fieldKeys.map(extractField)
-        var item = gatherFields(values)
-        console.log('extracted item:', item.title)
-        return item
+        return gatherFields(values)
 
         function extractField(key) {
             var path = itemPath + site.itemList.fields[key]

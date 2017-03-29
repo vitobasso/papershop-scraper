@@ -7,7 +7,7 @@ var webdriver = require('selenium-webdriver'),
     promise = webdriver.promise
 var driver = require('./driver/firefox').driver
 
-var site = loader.load('ebay')
+var site = loader.load('marktplaats')
 var log = s => () => console.log(s)
 
 promise.all(site.steps.map(pageAction))
@@ -16,9 +16,15 @@ promise.all(site.steps.map(pageAction))
 function pageAction(action){
     console.log('action', action)
     if(action.type == 'go') return driver.get(action.value)
-    if(action.type == 'click') return driver.findElement(By.xpath(action.target)).click();
-    if(action.type == 'type') return driver.findElement(By.xpath(action.target)).sendKeys(action.value);
+    if(action.type == 'click') return find(action.target).click();
+    if(action.type == 'type') return find(action.target).sendKeys(action.value);
     console.err('unknown action', action)
+}
+
+function find(path){
+    var locator = By.xpath(path)
+    driver.wait(until.elementLocated(locator), 5000)
+    return driver.findElement(locator)
 }
 
 function extractItems(send){
@@ -78,7 +84,6 @@ function injectExtractor(mapping, mode){
 }
 
 function inject(fileName, args){
-    console.log('inject', args)
     var jsonPath = path.join(__dirname, 'injectable', fileName + '.js')
     var content = fs.readFileSync(jsonPath, 'utf8')
     return driver.executeScript(content, args)

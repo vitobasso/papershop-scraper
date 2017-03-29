@@ -3,5 +3,9 @@
     - skip image loading
         http://stackoverflow.com/questions/40035343/javascript-disable-images-in-selenium-chromedriver
         http://www.sinaru.com/2015/04/18/speed-up-selenium-web-driver-tests-by-disabling-images-and-css/
-    - try driver.executeScript()
-        https://seleniumhq.github.io/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebDriver.html
+
+- better features
+    - include item fields
+    - improve guess (highlight part of text matching)
+
+- input form mapping

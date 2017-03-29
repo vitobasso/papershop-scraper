@@ -1,0 +1,30 @@
+{
+  "steps": [
+    { "type": "go", "value": "https://www.marktplaats.nl/" },
+    { "type": "click", "target": "//*[@id='track-accept']/input[2]" },
+    { "type": "click", "target": "//*[@id='input']" },
+    { "type": "type", "target": "//*[@id='input']", "value": "Android" },
+    { "type": "click", "target": "/html/body/mp-header/div[1]/div[3]/div/form/button" }
+  ],
+  "itemList": {
+    "items": "/html/body/div[3]/div/div[3]/div[2]/section[2]/article[]",
+    "fields": {
+      "title": "/div/div/div/h2/a/span/text()",
+      "price": "/div/div[2]/div/span/span/text()",
+      "image": "/figure/a/div/img[@src]",
+      "link": "/div/div/div/h2/a/span[@href]",
+      "address": "/div/div[3]/div/div[2]/text()",
+      "condition": "/div/div/div[2]/span/text()",
+      "availability": "/div/div[2]/div[2]/text()",
+      "pickup": "/div/div/div[2]/span[3]/text()",
+      "description": "/div/div/div/a/span/text()"
+    },
+    "next-page": { "type": "click", "target": "//*[@id='pagination']/a[2]/span" }
+  },
+  "features": {
+    "container": "/html/body/div[3]/div/section/div[1]/form/div[]",
+    "key": "/p/text()",
+    "values": "/div/div[]/label/span/text()"
+  }
+}
+
