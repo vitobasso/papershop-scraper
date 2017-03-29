@@ -10,7 +10,6 @@ var driver = require('./driver/firefox').driver
 var site = loader.load('ebay')
 
 var itemPaths = xpath.expand(site.itemList.items)
-var featurePaths = xpath.expand(site.features.container)
 var log = s => () => console.log(s)
 
 promise.all(site.steps.map(pageAction))
@@ -69,24 +68,13 @@ function extractItems(send){
 
 function extractFeatures(send){
     var t1 = Date.now()
-    promiseAsync(featurePaths, extractFeature)
+    injectExtractor(site)
         .then(features => {
-            features = features.filter(Boolean)
             var duration = Date.now() - t1 + "ms"
             console.log('extracted features:', duration, features)
             send(features)
         })
 
-    function extractFeature(path){
-        var keyPath = path + site.features.key
-        var valuePaths = xpath.expand(path + site.features.values)
-        var key = extract(keyPath)
-        var values = promiseAsync(valuePaths, extract)
-        return promise.all([key, values]).then(result => ({
-            key: result[0],
-            values: result[1].filter(Boolean)
-        }))
-    }
 }
 
 // ------------------------------- Generic -------------------------------
@@ -162,3 +150,18 @@ function handle(msg, ws){
     }
 }
 
+
+// ------------------------------- Inject code -------------------------------
+
+var fs = require('fs');
+var path = require('path');
+
+function injectExtractor(path){
+    return inject('extractor', path)
+}
+
+function inject(fileName, args){
+    var jsonPath = path.join(__dirname, 'injectable', fileName + '.js')
+    var content = fs.readFileSync(jsonPath, 'utf8')
+    return driver.executeScript(content, args)
+}
