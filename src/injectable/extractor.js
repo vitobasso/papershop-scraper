@@ -97,7 +97,8 @@ function prepend(value, array) {
 function extractFeatures(){
     var featurePaths = expandXPath('', site.features.container)
     return featurePaths.map(extractFeature)
-                                .filter(Boolean)
+                .filter(Boolean)
+                .filter(x => x.values.length)
 
     function extractFeature(path){
         var keyPath = path + site.features.key

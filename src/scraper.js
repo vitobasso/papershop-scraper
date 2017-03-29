@@ -22,8 +22,9 @@ function pageAction(action){
 }
 
 function find(path){
+    var timeout = 10000 //ms
     var locator = By.xpath(path)
-    driver.wait(until.elementLocated(locator), 5000)
+    driver.wait(until.elementLocated(locator), timeout)
     return driver.findElement(locator)
 }
 
