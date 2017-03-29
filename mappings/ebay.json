@@ -6,7 +6,7 @@
     { "type": "click", "target": "//*[@id='gh-btn']" }
   ],
   "itemList": {
-    "items": "/html/body/div[5]/div[2]/div[1]/div[1]/div/div[1]/div/div[3]/div/div[1]/div/w-root/div/div/ul/li[*50]",
+    "items": "/html/body/div[5]/div[2]/div[1]/div[1]/div/div[1]/div/div[3]/div/div[1]/div/w-root/div/div/ul/li[]",
     "fields": {
       "title": "/h3/a/text()",
       "price": "/ul/li/span/text()",

@@ -2,13 +2,14 @@
 
 var indexRegex = /\[\d*\]/
 
-// generates xpaths via index combinations for given original xpath
-// e.g., given:     /div/div[]/ul/li[] (can have any indexes filled in)
-//       returns:   /div/div[1]/ul/li[1]
-//                  /div/div[1]/ul/li[2]
-//                  /div/div[2]/ul/li[1]
-//                  /div/div[2]/ul/li[2]
-//                  ...
+/*
+generates xpaths via index combinations for given original xpath
+e.g., given:     /div/div[]/ul/li[] (can have any indexes filled in)
+      returns:   /div/div[1]/ul/li[1]
+                 /div/div[1]/ul/li[2]
+                 /div/div[2]/ul/li[1]
+                 /div/div[2]/ul/li[2]
+*/
 function expandXPath(prefix, suffixPattern){
     var parts = suffixPattern.split('/')
         .slice(1) //remove empty node before trailing "/"
@@ -93,23 +94,57 @@ function prepend(value, array) {
 
 // ------------------------------- extract -------------------------------
 
-function extractFeature(path){
-    var keyPath = path + site.features.key
-    var valuePaths = expandXPath(path, site.features.values)
-    var key = extract(keyPath)
-    if(!key) return null
-    var values = valuePaths.map(extract)
-    if(!values) return null
-    return {
-        key: key,
-        values: values.filter(Boolean)
+function extractFeatures(){
+    var featurePaths = expandXPath('', site.features.container)
+    return featurePaths.map(extractFeature)
+                                .filter(Boolean)
+
+    function extractFeature(path){
+        var keyPath = path + site.features.key
+        var valuePaths = expandXPath(path, site.features.values)
+        var key = extract(keyPath)
+        if(!key) return null
+        var values = valuePaths.map(extract)
+        if(!values) return null
+        return {
+            key: key,
+            values: values.filter(Boolean)
+        }
     }
 }
+
+function extractItems(){
+    console.log('extractItems')
+    var itemPaths = expandXPath('', site.itemList.items)
+    return itemPaths.map(extractItem)
+
+    function extractItem(itemPath) {
+        console.log('extractItem', itemPath)
+        var fieldKeys = Object.keys(site.itemList.fields)
+        var values = fieldKeys.map(extractField)
+        var item = gatherFields(values)
+        console.log('extracted item:', item.title)
+        return item
+
+        function extractField(key) {
+            var path = itemPath + site.itemList.fields[key]
+            return extract(path)
+        }
+
+        function gatherFields(values){
+            return values.reduce((obj, value, i) => {
+                var key = fieldKeys[i]
+                obj[key] = value;
+                return obj;
+            }, {});
+        }
+    }
+}
+
 
 function extract(path){
     var extractor = text(path) || attr(path)
     var elm = evaluateXPath(extractor.path)
-    console.log('extract', extractor.path, elm)
     if(!elm) return null
     return extractor.getter(elm)
 
@@ -132,10 +167,9 @@ function extract(path){
 
 // ------------------------------- call -------------------------------
 
-var site = arguments[0]
-console.log('site mapping:', site)
-
-var featurePaths = expandXPath('', site.features.container)
-var extractedFeatures = featurePaths.map(extractFeature)
-                            .filter(Boolean)
-return extractedFeatures
+console.log('arguments', arguments)
+var site = arguments[0][0]
+var mode = arguments[0][1]
+console.log('site mapping:', site, 'mode:', mode)
+if(mode == 'items') return extractItems()
+else if(mode == 'features') return extractFeatures()

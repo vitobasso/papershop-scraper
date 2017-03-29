@@ -8,8 +8,6 @@ var webdriver = require('selenium-webdriver'),
 var driver = require('./driver/firefox').driver
 
 var site = loader.load('ebay')
-
-var itemPaths = xpath.expand(site.itemList.items)
 var log = s => () => console.log(s)
 
 promise.all(site.steps.map(pageAction))
@@ -24,40 +22,12 @@ function pageAction(action){
 }
 
 function extractItems(send){
-    var t1 = Date.now()
-    promiseAsync(itemPaths, extractItem)
+    injectExtractor(site, 'items')
         .then(items => {
-            var duration = Date.now() - t1 + "ms"
-            console.log('extracted items:', duration)
+            console.log('extracted items')
             nextPage()
             send(items)
         })
-
-    function extractItem(itemPath) {
-        var fieldKeys = Object.keys(site.itemList.fields)
-        var t1 = Date.now()
-        return promiseAsync(fieldKeys, extractField)
-            .then(values => {
-                item = gatherFields(values)
-                var duration = Date.now() - t1 + "ms"
-                console.log('extracted item:', duration, item.title)
-                return item
-            })
-
-        function extractField(key) {
-            var path = itemPath + site.itemList.fields[key]
-            return extract(path)
-        }
-
-        function gatherFields(values){
-            return values.reduce((obj, value, i) => {
-                var key = fieldKeys[i]
-                obj[key] = value;
-                return obj;
-            }, {});
-        }
-
-    }
 
     function nextPage(){
         pageAction(site.itemList['next-page'])
@@ -67,63 +37,11 @@ function extractItems(send){
 
 
 function extractFeatures(send){
-    var t1 = Date.now()
-    injectExtractor(site)
+    injectExtractor(site, 'features')
         .then(features => {
-            var duration = Date.now() - t1 + "ms"
-            console.log('extracted features:', duration, features)
+            console.log('extracted features')
             send(features)
         })
-
-}
-
-// ------------------------------- Generic -------------------------------
-
-function extract(path){
-    var extractor = text(path) || attr(path)
-    return find(extractor.path)
-        .then(extractor.getter)
-        .catch(ex => {
-            console.log('extract: failed:', path)
-            return null
-        })
-
-    function text(field){
-        var match = /^(.*)\/text\(\)$/.exec(field)
-        if(match) return {
-            path: match[1],
-            getter: elm => elm.getText()
-        }
-    }
-
-    function attr(field){
-        var match = /^(.*)\[@(.*)\]$/.exec(field)
-        if(match) return {
-            path: match[1],
-            getter: elm => elm.getAttribute(match[2])
-        }
-    }
-}
-
-function find(path){
-    var locator = By.xpath(path)
-    return driver.findElement(By.xpath(path))
-}
-
-function promiseSync(arr, getPromise){
-    if(arr.length == 0) return
-    var head = arr[0]
-    var tail = arr.slice(1)
-    return getPromise(head)
-        .then(() => promiseSync(tail, getPromise))
-}
-
-function promiseAsync(arr, f){
-    return promise.all(
-        arr.map(x => {
-            var fx = () => f(x)
-            return promise.createFlow(fx)
-        }))
 }
 
 // ------------------------------- WebSocket -------------------------------
@@ -150,17 +68,17 @@ function handle(msg, ws){
     }
 }
 
-
 // ------------------------------- Inject code -------------------------------
 
 var fs = require('fs');
 var path = require('path');
 
-function injectExtractor(path){
-    return inject('extractor', path)
+function injectExtractor(mapping, mode){
+    return inject('extractor', [mapping, mode])
 }
 
 function inject(fileName, args){
+    console.log('inject', args)
     var jsonPath = path.join(__dirname, 'injectable', fileName + '.js')
     var content = fs.readFileSync(jsonPath, 'utf8')
     return driver.executeScript(content, args)
