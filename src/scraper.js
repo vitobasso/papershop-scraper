@@ -34,11 +34,35 @@ function extractItems(send){
             console.log('extracted items')
             nextPage()
             send('items', items)
+            send('features', getFeatures(items))
         })
 
     function nextPage(){
         pageAction(site.itemList['next-page'])
             .then( log("page: ready") )
+    }
+
+    function getFeatures(items){ //TODO array of {key, values}
+        var mapping = site.itemList.fields
+        var featureKeys = Object.keys(mapping)
+            .filter(k => mapping[k].feature)
+        var result = items.reduce(includeItemFields, {})
+        result = featureKeys.map(k => ({
+            key: k,
+            values: [...result[k]] //convert from Set to array
+        }))
+        console.log('getFeatures', result)
+        return result
+
+        function includeItemFields(acc, item){
+            Object.keys(item)
+                .filter(k => featureKeys.includes(k))
+                .forEach(k => { //include value of feature 'k' found in current item
+                    if(!acc[k]) acc[k] = new Set([])
+                    if(item[k]) acc[k] = acc[k].add(item[k])
+                })
+            return acc
+        }
     }
 }
 
