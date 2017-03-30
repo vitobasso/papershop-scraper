@@ -9,15 +9,15 @@
   "itemList": {
     "items": "/html/body/div[3]/div/div[3]/div[2]/section[2]/article[]",
     "fields": {
-      "title":        { "path": "/div/div/div/h2/a/span/text()" },
-      "price":        { "path": "/div/div[2]/div/span/span/text()" },
-      "image":        { "path": "/figure/a/div/img[@src]" },
-      "link":         { "path": "/div/div/div/h2/a[@href]" },
-      "address":      { "path": "/div/div[3]/div/div[2]/text()" },
-      "condition":    { "path": "/div/div/div[2]/span/text()", "feature": true },
-      "availability": { "path": "/div/div[2]/div[2]/text()", "feature": true },
-      "pickup":       { "path": "/div/div/div[2]/span[3]/text()", "feature": true },
-      "description":  { "path": "/div/div/div/a/span/text()" }
+      "title":            { "path": "/div/div/div/h2/a/span/text()" },
+      "price":            { "path": "/div/div[2]/div/span/span/text()" },
+      "image":            { "path": "/figure/a/div/img[@src]" },
+      "link":             { "path": "/div/div/div/h2/a[@href]" },
+      "address":          { "path": "/div/div[3]/div/div[2]/text()" },
+      "Conditie":         { "path": "/div/div/div[2]/span/text()", "feature": true },
+      "Aangeboden sinds": { "path": "/div/div[2]/div[2]/text()", "feature": true },
+      "pickup":           { "path": "/div/div/div[2]/span[3]/text()", "feature": true },
+      "description":      { "path": "/div/div/div/a/span/text()" }
     },
     "next-page": { "type": "click", "target": "//*[@id='pagination']/a[2]/span" }
   },

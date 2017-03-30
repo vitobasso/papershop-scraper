@@ -7,7 +7,7 @@ var webdriver = require('selenium-webdriver'),
     promise = webdriver.promise
 var driver = require('./driver/firefox').driver
 
-var site = loader.load('marktplaats')
+var site = loader.load('ebay')
 var log = s => () => console.log(s)
 
 promise.all(site.steps.map(pageAction))
