@@ -22,7 +22,7 @@ function pageAction(action){
 }
 
 function find(path){
-    var timeout = 10000 //ms
+    var timeout = 20000 //ms
     var locator = By.xpath(path)
     driver.wait(until.elementLocated(locator), timeout)
     return driver.findElement(locator)
@@ -33,7 +33,7 @@ function extractItems(send){
         .then(items => {
             console.log('extracted items')
             nextPage()
-            send(items)
+            send('items', items)
         })
 
     function nextPage(){
@@ -47,7 +47,7 @@ function extractFeatures(send){
     injectExtractor(site, 'features')
         .then(features => {
             console.log('extracted features')
-            send(features)
+            send('features', features)
         })
 }
 
@@ -65,13 +65,19 @@ wss.on('connection', function connection(ws) {
 });
 
 function handle(msg, ws){
-    if(msg == 'items') extractItems(send)
-    else if(msg == 'features') extractFeatures(send)
+    if(msg == 'items') extractItems(sender(ws))
+    else if(msg == 'features') extractFeatures(sender(ws))
     else if(msg == 'quit') driver.quit()
+}
 
-    function send(data) {
-        var msg = JSON.stringify(data)
-        ws.send(msg)
+function sender(ws){
+    return (subject, data) => {
+        var jsonMsg = {
+            subject: subject,
+            content: data
+        }
+        strMsg = JSON.stringify(jsonMsg)
+        ws.send(strMsg)
     }
 }
 

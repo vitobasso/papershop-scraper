@@ -125,7 +125,7 @@ function extractItems(){
         return gatherFields(values)
 
         function extractField(key) {
-            var path = itemPath + site.itemList.fields[key]
+            var path = itemPath + site.itemList.fields[key].path
             return extract(path)
         }
 
