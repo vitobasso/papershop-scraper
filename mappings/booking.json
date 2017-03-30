@@ -1,0 +1,28 @@
+{
+  "steps": [
+    { "type": "go", "value": "https://www.booking.com/" },
+    { "type": "click", "target": "//*[@id='ss']" },
+    { "type": "type", "target": "//*[@id='ss']", "value": "Amsterdam" },
+    { "type": "click", "target": "//*[@id='frm']/div[6]/button" }
+  ],
+  "itemList": {
+    "items": "/html/body/div[1]/div/div[4]/div[1]/div[1]/div[6]/div[3]/div[1]/div/div[]",
+    "fields": {
+      "title":          { "path": "/div[2]/div/div/h3/a/span/text()" },
+      "price":          { "path": "/div[2]/div/div[2]/div/div/a/span[2]/span/text()", "_comment": "actually rating number"},
+      "image":          { "path": "/div/a/img[@src]" },
+      "image2":         { "path": "/div/a[@style]", "regex": "background: url\\((.*)\\)" },
+      "link":           { "path": "/div[2]/div/div/h3/a[@href]" },
+      "District":       { "path": "/div[2]/div/div/h3/div[2]/a/text()" },
+      "Rating":         { "path": "/div[2]/div/div[2]/div/div/a/span/text()", "feature": true },
+      "reviews":        { "path": "/div[2]/div/div[2]/div/div/a[2]/span/text()" },
+      "description":    { "path": "/div[2]/div/div/p/text()" }
+    },
+    "next-page": { "type": "click", "target": "//*[contains(@class, 'paging-next')]" }
+  },
+  "features": {
+    "container": "/html/body/div[1]/div/div[4]/div[1]/div[2]/div[1]/div[3]/form/fieldset/div[1]/div/div[]",
+    "key": "/div/h3/text()",
+    "values": "/div[2]/a[]/div/span/text()"
+  }
+}

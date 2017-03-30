@@ -31,27 +31,33 @@ function find(path){
 function extractItems(send){
     injectExtractor(site, 'items')
         .then(items => {
-            console.log('extracted items')
             nextPage()
-            send('items', items)
-            send('features', getFeatures(items))
+            var filtered = filter(items)
+            send('items', filtered)
+            send('features', getFeatures(filtered))
         })
+
+    function filter(items) {
+        var filtered = items.filter(i => i.title && i.price)
+        var diff = items.length - filtered.length
+        if(diff > 0) console.log("rejected items:", diff)
+        return filtered
+    }
 
     function nextPage(){
         pageAction(site.itemList['next-page'])
             .then( log("page: ready") )
     }
 
-    function getFeatures(items){ //TODO array of {key, values}
+    function getFeatures(items){
         var mapping = site.itemList.fields
         var featureKeys = Object.keys(mapping)
             .filter(k => mapping[k].feature)
         var result = items.reduce(includeItemFields, {})
         result = featureKeys.map(k => ({
             key: k,
-            values: [...result[k]] //convert from Set to array
+            values: setToArray(result[k])
         }))
-        console.log('getFeatures', result)
         return result
 
         function includeItemFields(acc, item){
@@ -63,16 +69,17 @@ function extractItems(send){
                 })
             return acc
         }
+
+        function setToArray(set){
+            return set ? [...set] : []
+        }
     }
 }
 
 
 function extractFeatures(send){
     injectExtractor(site, 'features')
-        .then(features => {
-            console.log('extracted features')
-            send('features', features)
-        })
+        .then(features => send('features', features))
 }
 
 // ------------------------------- WebSocket -------------------------------

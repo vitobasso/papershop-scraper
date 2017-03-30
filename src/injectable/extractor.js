@@ -115,13 +115,13 @@ function extractFeatures(){
 }
 
 function extractItems(){
-    console.log('extractItems')
     var itemPaths = expandXPath('', site.itemList.items)
     return itemPaths.map(extractItem)
 
     function extractItem(itemPath) {
         var fieldKeys = Object.keys(site.itemList.fields)
         var values = fieldKeys.map(extractField)
+//        console.log('extractItem', fieldKeys, values)
         return gatherFields(values)
 
         function extractField(key) {
@@ -143,6 +143,7 @@ function extractItems(){
 function extract(path){
     var extractor = text(path) || attr(path)
     var elm = evaluateXPath(extractor.path)
+//    console.log('extract', path, extractor, elm)
     if(!elm) return null
     return extractor.getter(elm)
 
