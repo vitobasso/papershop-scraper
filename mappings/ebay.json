@@ -9,7 +9,10 @@
     "items": "/html/body/div[5]/div[2]/div[1]/div[1]/div/div[1]/div/div[3]/div/div[1]/div/w-root/div/div/ul/li[]",
     "fields": {
       "title":    { "path": "/h3/a/text()" },
-      "price":    { "path": "/ul/li/span/text()" },
+      "price":    { "path": "/ul/li/span/text()",
+                    "conversion": {
+                      "from": "\\$(\\d+\\.\\d+)",
+                      "to": { "currency": "USD", "value": "$1" }}},
       "Country":  { "path": "/ul[2]/li/text()", "feature": true },
       "Format":   { "path": "/ul/li[2]/span/text()", "feature": true },
       "image":    { "path": "/div/div/a/img[@src]" },

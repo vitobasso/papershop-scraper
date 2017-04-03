@@ -122,6 +122,7 @@ function injectExtractor(mapping, mode){
 }
 
 function inject(fileName, args){
+    //console.log('inject', fileName, args)
     var jsonPath = path.join(__dirname, 'injectable', fileName + '.js')
     var content = fs.readFileSync(jsonPath, 'utf8')
     return driver.executeScript(content, args)

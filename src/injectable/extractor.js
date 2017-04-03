@@ -122,11 +122,31 @@ function extractItems(){
         var fieldKeys = Object.keys(site.itemList.fields)
         var values = fieldKeys.map(extractField)
 //        console.log('extractItem', fieldKeys, values)
-        return gatherFields(values)
+        var item = gatherFields(values)
+        castPrice(item)
+        return item
 
         function extractField(key) {
-            var path = itemPath + site.itemList.fields[key].path
-            return extract(path)
+            var mapping = site.itemList.fields[key]
+            var path = itemPath + mapping.path
+            var rawStr = extract(path)
+            var fieldValue = convertField(rawStr, mapping.conversion)
+//            console.log('extractField', key, path, rawStr, fieldValue)
+            return fieldValue
+        }
+
+        function convertField(rawStr, conversion){
+//            console.log('convertField', rawStr, conversion)
+            if(!conversion || !rawStr) return rawStr
+            return convert(rawStr, new RegExp(conversion.from), conversion.to)
+
+            function convert(str, regex, template){
+                if (typeof template === 'string') {
+                    return rawStr.replace(regex, template)
+                } else if(typeof template === 'object') {
+                    return mapObj(template, v => convert(str, regex, v))
+                }
+            }
         }
 
         function gatherFields(values){
@@ -135,6 +155,10 @@ function extractItems(){
                 obj[key] = value;
                 return obj;
             }, {});
+        }
+
+        function castPrice(item){
+            if(item.price) item.price.value = parseFloat(item.price.value)
         }
     }
 }
@@ -162,6 +186,13 @@ function extract(path){
             getter: elm => elm.getAttribute(match[2])
         }
     }
+}
+
+function mapObj(obj, f){
+    var result = {}
+    Object.keys(obj)
+        .forEach(k => result[k] = f(obj[k]))
+    return result
 }
 
 // ------------------------------- call -------------------------------
