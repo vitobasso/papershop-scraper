@@ -1,11 +1,6 @@
 {
-  "steps": [
-    { "type": "go", "value": "https://www.marktplaats.nl/" },
-    { "type": "click", "target": "//*[@id='track-accept']/input[2]" },
-    { "type": "click", "target": "//*[@id='input']" },
-    { "type": "type", "target": "//*[@id='input']", "value": "Android" },
-    { "type": "click", "target": "/html/body/mp-header/div[1]/div[3]/div/form/button" }
-  ],
+  "url": "https://www.marktplaats.nl/z.html?query=${KEYWORDS}&currentPage=${PAGE}",
+  "followingAction": "TODO click to accept cookies",
   "itemList": {
     "items": "/html/body/div[3]/div/div[3]/div[2]/section[2]/article[]",
     "fields": {
@@ -18,8 +13,7 @@
       "Aangeboden sinds": { "path": "/div/div[2]/div[2]/text()", "feature": true },
       "pickup":           { "path": "/div/div/div[2]/span[3]/text()", "feature": true },
       "description":      { "path": "/div/div/div/a/span/text()" }
-    },
-    "next-page": { "type": "click", "target": "//*[@id='pagination']/a[2]/span" }
+    }
   },
   "features": {
     "container": "/html/body/div[3]/div/section/div[1]/form/div[]",
@@ -27,4 +21,3 @@
     "values": "/div/div[]/label/span/text()"
   }
 }
-

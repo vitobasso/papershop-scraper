@@ -1,10 +1,5 @@
 {
-  "steps": [
-    { "type": "go", "value": "http://www.amazon.de/" },
-    { "type": "click", "target": "//*[@id='twotabsearchtextbox']" },
-    { "type": "type", "target": "//*[@id='twotabsearchtextbox']", "value": "Android" },
-    { "type": "click", "target": "//*[@id='nav-search']/form/div[2]/div/input" }
-  ],
+  "url": "https://www.amazon.de/s/?page=${PAGE}&keywords=${KEYWORDS}",
   "itemList": {
     "items": "/html/body/div[1]/div[1]/div/div[3]/div[2]/div/div[4]/div[1]/div/ul/li[]",
     "fields": {
@@ -15,8 +10,7 @@
                         "to": { "currency": "$1", "value": "$2.$3" }}},
       "image":    { "path": "/div/div/div/div/div/div/a/img[@src]" },
       "link":     { "path": "/div/div/div/div[2]/div/div/a[@href]" }
-    },
-    "next-page": { "type": "click", "target": "//*[@id='pagnNextLink']" }
+    }
   },
   "features": {
     "container": "/html/body/div[1]/div[1]/div/div[3]/div[3]/div[2]/div",
@@ -24,3 +18,4 @@
     "values": "/li/text()"
   }
 }
+

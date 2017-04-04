@@ -133,18 +133,18 @@ function extractItems(){
             var fieldValue = convertField(rawStr, mapping.conversion)
 //            console.log('extractField', key, path, rawStr, fieldValue)
             return fieldValue
-        }
 
-        function convertField(rawStr, conversion){
-//            console.log('convertField', rawStr, conversion)
-            if(!conversion || !rawStr) return rawStr
-            return convert(rawStr, new RegExp(conversion.from), conversion.to)
+            function convertField(rawStr, conversion){
+    //            console.log('convertField', rawStr, conversion)
+                if(!conversion || !rawStr) return rawStr
+                return convert(rawStr, new RegExp(conversion.from), conversion.to)
 
-            function convert(str, regex, template){
-                if (typeof template === 'string') {
-                    return rawStr.replace(regex, template)
-                } else if(typeof template === 'object') {
-                    return mapObj(template, v => convert(str, regex, v))
+                function convert(str, regex, template){
+                    if (typeof template === 'string') {
+                        return rawStr.replace(regex, template)
+                    } else if(typeof template === 'object') {
+                        return mapObj(template, v => convert(str, regex, v))
+                    }
                 }
             }
         }

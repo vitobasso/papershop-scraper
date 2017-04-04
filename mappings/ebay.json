@@ -1,10 +1,5 @@
 {
-  "steps": [
-    { "type": "go", "value": "http://www.ebay.com/" },
-    { "type": "click", "target": "//*[@id='gh-ac']" },
-    { "type": "type", "target": "//*[@id='gh-ac']", "value": "Android" },
-    { "type": "click", "target": "//*[@id='gh-btn']" }
-  ],
+  "url": "http://www.ebay.com/sch/i.html?_nkw=${KEYWORDS}&_pgn=${PAGE}&_skc=25",
   "itemList": {
     "items": "/html/body/div[5]/div[2]/div[1]/div[1]/div/div[1]/div/div[3]/div/div[1]/div/w-root/div/div/ul/li[]",
     "fields": {
@@ -17,8 +12,7 @@
       "Format":   { "path": "/ul/li[2]/span/text()", "feature": true },
       "image":    { "path": "/div/div/a/img[@src]" },
       "link":     { "path": "/h3/a[@href]" }
-    },
-    "next-page": { "type": "click", "target": "//*[@id='Pagination']/tbody/tr/td[3]/a" }
+    }
   },
   "features": {
     "container": "/html/body/div[5]/div[2]/div[1]/div[3]/div/div/div[1]/div[2]/div[]",

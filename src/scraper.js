@@ -10,17 +10,6 @@ var driver = require('./driver/firefox').driver
 var site = loader.load('ebay')
 var log = s => () => console.log(s)
 
-promise.all(site.steps.map(pageAction))
-    .then( log("page: ready") )
-
-function pageAction(action){
-    console.log('action', action)
-    if(action.type == 'go') return driver.get(action.value)
-    if(action.type == 'click') return find(action.target).click();
-    if(action.type == 'type') return find(action.target).sendKeys(action.value);
-    console.err('unknown action', action)
-}
-
 function find(path){
     var timeout = 20000 //ms
     var locator = By.xpath(path)
@@ -28,13 +17,13 @@ function find(path){
     return driver.findElement(locator)
 }
 
-function extractItems(send){
-    injectExtractor(site, 'items')
+function extractItems(params, respond){
+    goToPage(params)
+        .then(() => injectExtractor(site, 'items'))
         .then(items => {
-            nextPage()
             var filtered = filter(items)
-            send('items', filtered)
-            send('features', getFeatures(filtered))
+            respond('items', filtered)
+            respond('features', getFeatures(filtered))
         })
 
     function filter(items) {
@@ -42,11 +31,6 @@ function extractItems(send){
         var diff = items.length - filtered.length
         if(diff > 0) console.log("rejected items:", diff)
         return filtered
-    }
-
-    function nextPage(){
-        pageAction(site.itemList['next-page'])
-            .then( log("page: ready") )
     }
 
     function getFeatures(items){
@@ -76,11 +60,45 @@ function extractItems(send){
     }
 }
 
-
-function extractFeatures(send){
+function extractFeatures(params, respond){
     injectExtractor(site, 'features')
-        .then(features => send('features', features))
+        .then(features => respond('features', features))
 }
+
+function goToPage(params){
+    var template = site.url
+    var urlParams = getUrlParams(params)
+    var url = template.formatUnicorn(urlParams)
+    console.log('goToPage', url)
+    return driver.get(url)
+
+    function getUrlParams(request){
+        var keywords = request.keywords
+        var page = request.page
+        if(site.pagingMode == 'offset') {
+            var itemsPerPage = request.itemsPerPage
+            var offset = itemsPerPage * (page - 1)
+            return {KEYWORDS: keywords, ITEMS_PER_PAGE: itemsPerPage, OFFSET: offset}
+        } else {
+            return {KEYWORDS: keywords, PAGE: page}
+        }
+    }
+}
+
+String.prototype.formatUnicorn = String.prototype.formatUnicorn ||
+function () {
+    "use strict";
+    var str = this.toString();
+    if (arguments.length) {
+        var t = typeof arguments[0];
+        var key;
+        var args = ("string" === t || "number" === t) ? Array.prototype.slice.call(arguments) : arguments[0];
+        for (key in args) {
+            str = str.replace(new RegExp("\\$\\{" + key + "\\}", "gi"), args[key]);
+        }
+    }
+    return str;
+};
 
 // ------------------------------- WebSocket -------------------------------
 
@@ -89,19 +107,20 @@ var wss = new WebSocket.Server({ port: 8080 });
 wss.on('connection', function connection(ws) {
     console.log('ws: connected')
 
-    ws.on('message', function incoming(message) {
-        console.log('ws: received:', message);
-        handle(message, ws)
+    ws.on('message', strMsg => {
+        console.log('ws: received:', strMsg);
+        var jsonMsg = JSON.parse(strMsg)
+        handle(jsonMsg, ws)
     });
 });
 
 function handle(msg, ws){
-    if(msg == 'items') extractItems(sender(ws))
-    else if(msg == 'features') extractFeatures(sender(ws))
-    else if(msg == 'quit') driver.quit()
+    if(msg.subject == 'items') extractItems(msg.params, respondFor(ws))
+    else if(msg.subject == 'features') extractFeatures(msg.params, respondFor(ws))
+    else if(msg.subject == 'quit') driver.quit()
 }
 
-function sender(ws){
+function respondFor(ws){
     return (subject, data) => {
         var jsonMsg = {
             subject: subject,
