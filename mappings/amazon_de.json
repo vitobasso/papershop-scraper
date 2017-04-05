@@ -6,8 +6,8 @@
       "title":    { "path": "/div/div/div/div[2]/div/div/a/h2/text()" },
       "price":    { "path": "/div/div/div/div[2]/div[2]/div/div/a/span[2]/text()",
                     "conversion": {
-                        "from": "(\\w+) (\\d+),(\\d+)",
-                        "to": { "currency": "$1", "value": "$2.$3" }}},
+                      "from": "(\\w+) (\\d+),(\\d+)",
+                      "to": { "currency": "$1", "value": "$2.$3" }}},
       "image":    { "path": "/div/div/div/div/div/div/a/img[@src]" },
       "link":     { "path": "/div/div/div/div[2]/div/div/a[@href]" }
     }

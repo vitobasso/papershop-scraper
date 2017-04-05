@@ -4,15 +4,19 @@
   "itemList": {
     "items": "/html/body/div[1]/div/div[4]/div[1]/div[1]/div[6]/div[3]/div[1]/div/div[]",
     "fields": {
-      "title":          { "path": "/div[2]/div/div/h3/a/span/text()" },
-      "price":          { "path": "/div[2]/div/div[2]/div/div/a/span[2]/span/text()", "_comment": "actually rating number"},
-      "image":          { "path": "/div/a/img[@src]" },
-      "image2":         { "path": "/div/a[@style]", "regex": "background: url\\((.*)\\)" },
-      "link":           { "path": "/div[2]/div/div/h3/a[@href]" },
-      "District":       { "path": "/div[2]/div/div/h3/div[2]/a/text()" },
-      "Rating":         { "path": "/div[2]/div/div[2]/div/div/a/span/text()", "feature": true },
-      "reviews":        { "path": "/div[2]/div/div[2]/div/div/a[2]/span/text()" },
-      "description":    { "path": "/div[2]/div/div/p/text()" }
+      "title":       { "path": "/div[2]/div/div/h3/a/span/text()" },
+      "price":       { "path": "/div[2]/div/div[2]/div/div/a/span[2]/span/text()",
+                        "_comment": "actually rating number",
+                        "conversion": {
+                          "from": "(.*)",
+                          "to": { "currency": "Rating", "value": "$1" }}},
+      "image":      [{ "path": "/div/a/img[@src]" },
+                     { "path": "/div/a[@style]", "conversion": { "from": "background: url\\((.*)\\)", "to": "$1" }}],
+      "link":        { "path": "/div[2]/div/div/h3/a[@href]" },
+      "District":    { "path": "/div[2]/div/div/h3/div[2]/a/text()" },
+      "Rating":      { "path": "/div[2]/div/div[2]/div/div/a/span/text()", "feature": true },
+      "reviews":     { "path": "/div[2]/div/div[2]/div/div/a[2]/span/text()" },
+      "description": { "path": "/div[2]/div/div/p/text()" }
     }
   },
   "features": {

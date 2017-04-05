@@ -7,7 +7,7 @@ var webdriver = require('selenium-webdriver'),
     promise = webdriver.promise
 var driver = require('./driver/firefox').driver
 
-var site = loader.load('ebay')
+var site = loader.load('booking')
 var log = s => () => console.log(s)
 
 function find(path){

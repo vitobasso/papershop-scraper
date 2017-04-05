@@ -128,11 +128,29 @@ function extractItems(){
 
         function extractField(key) {
             var mapping = site.itemList.fields[key]
-            var path = itemPath + mapping.path
-            var rawStr = extract(path)
-            var fieldValue = convertField(rawStr, mapping.conversion)
-//            console.log('extractField', key, path, rawStr, fieldValue)
-            return fieldValue
+            if(Array.isArray(mapping))
+                return tryAlternativeMappings(mapping)
+            else
+                return extractWithMapping(mapping)
+
+            function tryAlternativeMappings(mappings){
+                console.log('tryAlternativeMappings', mappings)
+                for(var mapping of mappings){
+                    var result = extractWithMapping(mapping)
+                    if(result) return result //stop on the first that works
+                }
+            }
+
+            function extractWithMapping(mapping){
+                console.log('extractWithMapping', key, mapping)
+                var path = itemPath + mapping.path
+                console.log('extractWithMapping', key, path)
+                var rawStr = extract(path)
+                console.log('extractWithMapping', key, rawStr)
+                var fieldValue = convertField(rawStr, mapping.conversion)
+                console.log('extractWithMapping', key, fieldValue)
+                return fieldValue
+            }
 
             function convertField(rawStr, conversion){
     //            console.log('convertField', rawStr, conversion)
