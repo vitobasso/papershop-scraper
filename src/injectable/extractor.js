@@ -153,15 +153,19 @@ function extractItems(){
             }
 
             function convertField(rawStr, conversion){
-    //            console.log('convertField', rawStr, conversion)
+                console.log('convertField', rawStr, conversion)
                 if(!conversion || !rawStr) return rawStr
                 return convert(rawStr, new RegExp(conversion.from), conversion.to)
 
                 function convert(str, regex, template){
                     if (typeof template === 'string') {
-                        return rawStr.replace(regex, template)
+                        var result = str.replace(regex, template)
+                        console.log('convertField', str, regex, template, result)
+                        return result
                     } else if(typeof template === 'object') {
-                        return mapObj(template, v => convert(str, regex, v))
+                        var result = mapObj(template, v => convert(str, regex, v))
+                        console.log('convertField', str, regex, template, result)
+                        return result
                     }
                 }
             }

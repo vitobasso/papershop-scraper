@@ -1,11 +1,15 @@
 {
+  "preparation": [{ "action": "go", "target": "https://www.marktplaats.nl" },
+                  { "action": "click", "target": "//*[@id='track-accept']/input[2]" }],
   "url": "https://www.marktplaats.nl/z.html?query=${KEYWORDS}&currentPage=${PAGE}",
-  "followingAction": "TODO click to accept cookies",
   "itemList": {
     "items": "/html/body/div[3]/div/div[3]/div[2]/section[2]/article[]",
     "fields": {
       "title":            { "path": "/div/div/div/h2/a/span/text()" },
-      "price":            { "path": "/div/div[2]/div/span/span/text()" },
+      "price":            { "path": "/div/div[2]/div/span/span/text()",
+                            "conversion": {
+                              "from": "(\\S+)\\s(\\d+),(\\d+)",
+                              "to": { "currency": "$1", "value": "$2.$3" }}},
       "image":            { "path": "/figure/a/div/img[@src]" },
       "link":             { "path": "/div/div/div/h2/a[@href]" },
       "address":          { "path": "/div/div[3]/div/div[2]/text()" },

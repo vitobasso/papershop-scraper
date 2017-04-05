@@ -7,14 +7,28 @@ var webdriver = require('selenium-webdriver'),
     promise = webdriver.promise
 var driver = require('./driver/firefox').driver
 
-var site = loader.load('booking')
+var site = loader.load('marktplaats')
 var log = s => () => console.log(s)
 
-function find(path){
-    var timeout = 20000 //ms
-    var locator = By.xpath(path)
-    driver.wait(until.elementLocated(locator), timeout)
-    return driver.findElement(locator)
+prepare().then(() => console.log('page ready'))
+function prepare(){
+    if(site.preparation){
+        console.log('prepare')
+        var steps = site.preparation
+        return promise.all(steps.map(pageAction))
+    } else return promise.fulfilled()
+
+    function pageAction(step){
+        console.log('step', step)
+        if(step.action == 'go') return driver.get(step.target)
+        if(step.action == 'click') return find(step.target).click();
+        console.error('unknown action', step)
+    }
+
+    function find(path){
+        var locator = By.xpath(path)
+        return driver.findElement(locator)
+    }
 }
 
 function extractItems(params, respond){
@@ -23,7 +37,7 @@ function extractItems(params, respond){
         .then(items => {
             var filtered = filter(items)
             respond('items', filtered)
-            respond('features', getFeatures(filtered))
+            respond('features', getOccurringFeatures(filtered))
         })
 
     function filter(items) {
@@ -33,7 +47,7 @@ function extractItems(params, respond){
         return filtered
     }
 
-    function getFeatures(items){
+    function getOccurringFeatures(items){
         var mapping = site.itemList.fields
         var featureKeys = Object.keys(mapping)
             .filter(k => mapping[k].feature)
