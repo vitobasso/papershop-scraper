@@ -8,7 +8,8 @@
                     "conversion": {
                       "from": "\\$(\\d+\\.\\d+)",
                       "to": { "currency": "USD", "value": "$1" }}},
-      "Country":  { "path": "/ul[2]/li/text()", "feature": true },
+      "Country":  { "path": "/ul[2]/li/text()", "feature": true,
+                    "conversion": { "from": "From (.+)", "to": "$1"}},
       "Format":   { "path": "/ul/li[2]/span/text()", "feature": true },
       "image":    { "path": "/div/div/a/img[@src]" },
       "link":     { "path": "/h3/a[@href]" }
