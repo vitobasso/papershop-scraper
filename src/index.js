@@ -13,9 +13,13 @@ wss.on('connection', function connection(ws) {
 });
 
 function handle(msg, ws){
-    if(msg.subject == 'items') scraper.extractItems(msg.params, respondFor(ws))
-    else if(msg.subject == 'features') scraper.extractFeatures(msg.params, respondFor(ws))
-    else if(msg.subject == 'quit') driver.quit()
+    var endpoints = {
+        "list-sources": () => scraper.listSources(respondFor(ws)),
+        "change-source": () => scraper.changeSource(msg.params, respondFor(ws)),
+        "items": () => scraper.extractItems(msg.params, respondFor(ws)),
+        "features": () => scraper.extractFeatures(msg.params, respondFor(ws))
+    }
+    endpoints[msg.subject]()
 }
 
 function respondFor(ws){

@@ -6,28 +6,36 @@ var webdriver = require('selenium-webdriver'),
     until = webdriver.until;
     promise = webdriver.promise
 var driver = require('./driver/firefox').driver
-
-var site = loader.load('ebay')
 var log = s => () => console.log(s)
+var site
 
-prepare().then(() => console.log('page ready'))
-function prepare(){
-    if(site.preparation){
-        console.log('prepare')
-        var steps = site.preparation
-        return promise.all(steps.map(pageAction))
-    } else return promise.fulfilled()
+//TODO infer from filenames
+exports.listSources = (respond) => {
+    var list = ['ebay', 'amazon_de', 'marktplaats', 'booking']
+    respond('list-sources', list)
+}
 
-    function pageAction(step){
-        console.log('step', step)
-        if(step.action == 'go') return driver.get(step.target)
-        if(step.action == 'click') return find(step.target).click();
-        console.error('unknown action', step)
-    }
+exports.changeSource = (params) => {
+    site = loader.load(params.name)
+    prepare().then(() => console.log('page ready'))
 
-    function find(path){
-        var locator = By.xpath(path)
-        return driver.findElement(locator)
+    function prepare(){
+        if(site.preparation){
+            var steps = site.preparation
+            return promise.all(steps.map(pageAction))
+        } else return promise.fulfilled()
+
+        function pageAction(step){
+            console.log('step', step)
+            if(step.action == 'go') return driver.get(step.target)
+            if(step.action == 'click') return find(step.target).click();
+            console.error('unknown action', step)
+        }
+
+        function find(path){
+            var locator = By.xpath(path)
+            return driver.findElement(locator)
+        }
     }
 }
 
