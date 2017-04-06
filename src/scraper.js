@@ -44,7 +44,7 @@ exports.extractItems = (params, respond) => {
         .then(() => injectExtractor(site, 'items'))
         .then(items => {
             var filtered = filter(items)
-            respond('items', filtered)
+            respond('items', filtered, params)
             respond('features', getOccurringFeatures(filtered))
         })
 
@@ -84,7 +84,7 @@ exports.extractItems = (params, respond) => {
 
 exports.extractFeatures = (params, respond) => {
     injectExtractor(site, 'features')
-        .then(features => respond('features', features))
+        .then(features => respond('features', features, params))
 }
 
 function goToPage(params){

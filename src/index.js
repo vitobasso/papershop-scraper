@@ -23,9 +23,10 @@ function handle(msg, ws){
 }
 
 function respondFor(ws){
-    return (subject, data) => {
+    return (subject, data, params) => {
         var jsonMsg = {
             subject: subject,
+            params: params, // echo received params
             content: data
         }
         strMsg = JSON.stringify(jsonMsg)
