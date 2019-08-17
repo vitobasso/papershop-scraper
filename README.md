@@ -6,6 +6,6 @@ Scrapes HTML and provides data for
 
 ## Running
 ```
-node install selenium-webdriver --save
-node experiment
+npm install 
+node src/index.js
 ```

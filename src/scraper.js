@@ -5,7 +5,8 @@ var webdriver = require('selenium-webdriver'),
     By = webdriver.By,
     until = webdriver.until;
     promise = webdriver.promise
-var driver = require('./driver/firefox').driver
+//var driver = require('./driver/firefox').driver
+var driver = require('./driver/phantomjs').driver
 var log = s => () => console.log(s)
 var site
 
