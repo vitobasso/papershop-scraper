@@ -9,3 +9,8 @@ Scrapes HTML and provides data for
 npm install 
 node src/index.js
 ```
+
+
+## Setup
+firefox requires `brew install geckowebdriver`
+phantomjs doesn't support ES6

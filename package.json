@@ -4,10 +4,10 @@
   "description": "",
   "main": "experiment.js",
   "dependencies": {
-    "selenium-webdriver": "3.3.0",
+    "selenium-webdriver": "3.6.0",
     "fs": "0.0.2",
     "path": "0.12.7",
-    "ws": "2.2.2"
+    "ws": "7.1.2"
   },
   "devDependencies": {},
   "scripts": {
